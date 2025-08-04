@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  email String @unique
+  password String
+  Customer Customer[]
+
+  Transaction Transaction[]
+
+  Property Property[]
+}
+model Customer {
+  id Int @id @default(autoincrement())
+  name String
+  email String @unique
+  phone String
+  address String
+  userId Int
+  Property Property[]
+  user User @relation(fields: [userId], references: [id])
+
+  Transaction Transaction[]
+}
+enum PropertyType {
+  HOME
+  APPARTMENT
+  VILLA
+  COMMERCIAL
+  INDUSTRIAL
+  LAND
+}
+enum PropertyPurpose {
+  RENTAL
+  SALE
+  LEASE
+}
+enum PropertyStatus {
+  AVAILABLE
+  SOLD
+  RENTED
+  UNDER_CONSTRUCTION
+}
+model Property {
+  id Int @id @default(autoincrement())
+  title String
+  description String?
+  customerId Int
+  propertySize Float
+  customer Customer @relation(fields: [customerId], references: [id])
+  propertyType PropertyType
+  propertyPurpose PropertyPurpose
+  propertyPrice Float
+  propertyLocation String
+  propertyStatus PropertyStatus
+  images        PropertyImage[]  // One-to-many relation
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  Transaction Transaction[]
+}
+model PropertyImage {
+  id         Int      @id @default(autoincrement())
+  url        String
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId Int
+}
+enum TransactionType {
+  SALE
+  RENT
+  LEASE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+model Transaction {
+  id              Int               @id @default(autoincrement())
+  propertyId      Int
+  customerId      Int               // Buyer or Renter
+  userId          Int               // Real estate agent or admin
+  transactionType TransactionType
+  transactionDate DateTime          @default(now())
+  startDate       DateTime?         // For RENT or LEASE
+  endDate         DateTime?         // For RENT or LEASE
+  amount          Float
+  status          TransactionStatus @default(PENDING)
+  commission       Float?            // Optional commission for the agent
+  
+  // Relations
+  property        Property          @relation(fields: [propertyId], references: [id])
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  user            User              @relation(fields: [userId], references: [id])
+  Payment Payment[]
+}
+model Payment{
+  id Int @id @default(autoincrement())
+  transactionId Int
+  amount Float
+  paymentDate DateTime @default(now())
+  paymentMethod String // e.g., 'Credit Card', 'Bank Transfer'
+  // Relations
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+}
