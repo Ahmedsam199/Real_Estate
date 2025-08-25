@@ -3,24 +3,24 @@ import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class createPropertyDTO {
   @IsNotEmpty()
-  name: string;
+  title: string;
   @IsNotEmpty()
   description: string;
   @IsNotEmpty()
   @IsEnum(PropertyType)
-  type: PropertyType;
+  propertyType: PropertyType;
   @IsNotEmpty()
   @IsEnum(PropertyPurpose)
-  purpose: PropertyPurpose;
-  status: PropertyStatus;
+  propertyPurpose: PropertyPurpose;
+  propertyStatus: PropertyStatus;
   @IsNotEmpty()
   @IsNumber()
-  price: number;
+  propertyPrice: number;
   @IsNotEmpty()
   @IsNumber()
-  peropertySize: number;
+  propertySize: number;
   @IsNotEmpty()
-  location: string;
+  propertyLocation: string;
   @IsNotEmpty()
   customerId: string; // Optional, if the property is linked to a customer
 }

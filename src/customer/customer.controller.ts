@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -18,8 +19,8 @@ export class CustomerController {
   constructor(private readonly customerSerive: CustomerService) {}
   @UseGuards(AuthGuard('jwt'))
   @Get('')
-  async getCustomers(@Req() req) {
-    return this.customerSerive.getCustomers(req.user.userId);
+  async getCustomers(@Req() req, @Query('search') search) {
+    return this.customerSerive.getCustomers(req.user.userId, search);
   }
   @UseGuards(AuthGuard('jwt'))
   @Post('')

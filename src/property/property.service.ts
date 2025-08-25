@@ -56,26 +56,26 @@ export class PropertyService {
   }
   async createProperty(userId: string, createPropertyDTO: createPropertyDTO) {
     const {
-      name,
+      title,
       description,
-      type,
-      purpose,
-      status,
-      price,
-      location,
+      propertyType,
+      propertyPurpose,
+      propertyPrice,
+      propertyLocation,
       customerId,
+      propertySize,
     } = createPropertyDTO;
 
     return this.prismaService.property.create({
       data: {
-        title: name,
+        title,
         description,
-        propertyType: type,
-        propertyPurpose: purpose,
-        propertyStatus: status || PropertyStatus.AVAILABLE,
-        propertyPrice: price,
-        propertySize: createPropertyDTO.peropertySize,
-        propertyLocation: location,
+        propertyType,
+        propertyPurpose,
+        propertyStatus: PropertyStatus.AVAILABLE,
+        propertyPrice,
+        propertySize,
+        propertyLocation,
         userId: +userId,
         customerId: +customerId, // Ensure customerId is a number
       },
@@ -87,13 +87,13 @@ export class PropertyService {
   }
   async updateProperty(id: string, createPropertyDTO: createPropertyDTO) {
     const {
-      name,
+      title,
       description,
-      type,
-      purpose,
-      status,
-      price,
-      location,
+      propertyType,
+      propertyPurpose,
+      propertySize,
+      propertyPrice,
+      propertyLocation,
       customerId,
     } = createPropertyDTO;
 
@@ -102,14 +102,14 @@ export class PropertyService {
         id: +id, // Ensure id is a number
       },
       data: {
-        title: name,
+        title: title,
         description,
-        propertyType: type,
-        propertyPurpose: purpose,
-        propertyStatus: status || PropertyStatus.AVAILABLE,
-        propertyPrice: price,
-        propertySize: createPropertyDTO.peropertySize,
-        propertyLocation: location,
+        propertyType,
+        propertyPurpose,
+        propertyStatus: PropertyStatus.AVAILABLE,
+        propertyPrice,
+        propertySize,
+        propertyLocation,
         customerId: +customerId, // Ensure customerId is a number
       },
       include: {
@@ -122,6 +122,25 @@ export class PropertyService {
     return this.prismaService.property.delete({
       where: {
         id: +id, // Ensure id is a number
+      },
+    });
+  }
+  async getById(id: string) {
+    return this.prismaService.property.findUnique({
+      where: {
+        id: +id, // Ensure id is a number
+      },
+    });
+  }
+  async getRelatedProperties(customerId: string, propertyPurpose: string) {
+    return this.prismaService.property.findMany({
+      where: {
+        customerId: +customerId,
+        propertyPurpose: propertyPurpose == 'RENT' ? 'RENTAL' : 'SALE',
+      },
+      select: {
+        id: true,
+        title: true,
       },
     });
   }

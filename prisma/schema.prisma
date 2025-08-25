@@ -18,9 +18,11 @@ model User {
   password String
   Customer Customer[]
 
-  Transaction Transaction[]
+  Contract Contract[]
 
   Property Property[]
+
+  Payment Payment[]
 }
 model Customer {
   id Int @id @default(autoincrement())
@@ -31,8 +33,8 @@ model Customer {
   userId Int
   Property Property[]
   user User @relation(fields: [userId], references: [id])
-
-  Transaction Transaction[]
+  contractsAsCustomer Contract[] @relation("CustomerAsCustomer")
+  
 }
 enum PropertyType {
   HOME
@@ -68,7 +70,7 @@ model Property {
   images        PropertyImage[]  // One-to-many relation
   userId Int
   user User @relation(fields: [userId], references: [id])
-  Transaction Transaction[]
+  Contract Contract[]
 }
 model PropertyImage {
   id         Int      @id @default(autoincrement())
@@ -76,42 +78,57 @@ model PropertyImage {
   property   Property @relation(fields: [propertyId], references: [id])
   propertyId Int
 }
-enum TransactionType {
+enum ContractType {
   SALE
   RENT
   LEASE
 }
 
-enum TransactionStatus {
+enum ContractStatus {
   PENDING
   COMPLETED
   CANCELLED
 }
-model Transaction {
+model Contract {
   id              Int               @id @default(autoincrement())
   propertyId      Int
   customerId      Int               // Buyer or Renter
   userId          Int               // Real estate agent or admin
-  transactionType TransactionType
-  transactionDate DateTime          @default(now())
+  contractType ContractType
+  contractDate DateTime          @default(now())
   startDate       DateTime?         // For RENT or LEASE
   endDate         DateTime?         // For RENT or LEASE
   amount          Float
-  status          TransactionStatus @default(PENDING)
+  status          ContractStatus @default(PENDING)
   commission       Float?            // Optional commission for the agent
   
   // Relations
   property        Property          @relation(fields: [propertyId], references: [id])
-  customer        Customer          @relation(fields: [customerId], references: [id])
+  customer        Customer          @relation("CustomerAsCustomer", fields: [customerId], references: [id])
+  
   user            User              @relation(fields: [userId], references: [id])
   Payment Payment[]
 }
+enum PaymentStatus{
+  PAID
+  ON_HOLD
+}
 model Payment{
   id Int @id @default(autoincrement())
-  transactionId Int
+  contractId Int
   amount Float
+  paymentStatus PaymentStatus
   paymentDate DateTime @default(now())
-  paymentMethod String // e.g., 'Credit Card', 'Bank Transfer'
+  paymentMethod String
+  remarks String?
+  userId Int
+  user User @relation(fields: [userId],references: [id])
   // Relations
-  transaction Transaction @relation(fields: [transactionId], references: [id])
+  contract Contract @relation(fields: [contractId], references: [id])
+}
+model PrintSettings {
+  id           Int    @id @default(autoincrement())
+  title        String
+  html         String @db.Text
+  printSetting Json
 }

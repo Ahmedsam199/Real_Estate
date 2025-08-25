@@ -5,12 +5,20 @@ import { CreateCustomerDto } from './DTO/CreateCustomer.dto';
 @Injectable()
 export class CustomerService {
   constructor(private readonly prismaService: PrismaService) {}
-  async getCustomers(userId: string): Promise<any> {
-    // Logic to retrieve customers for the given user ID
+  async getCustomers(userId: string, search?: string): Promise<any> {
+    const where: any = {
+      userId: +userId,
+    };
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { phone: { contains: search } },
+      ];
+    }
+
     return this.prismaService.customer.findMany({
-      where: {
-        userId: +userId,
-      },
+      where,
     });
   }
   async createCustomer(
