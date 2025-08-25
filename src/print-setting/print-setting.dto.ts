@@ -12,6 +12,9 @@ export class PrintSettingDTO {
   @IsNotEmpty()
   @IsString()
   title: string;
+  @IsNotEmpty()
+  @IsString()
+  doctype: string;
 
   @IsNotEmpty()
   @IsString()

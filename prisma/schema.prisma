@@ -130,6 +130,7 @@ model Payment{
 }
 model PrintSettings {
   id           Int    @id @default(autoincrement())
+  doctype String
   title        String
   html         String @db.Text
   printSetting Json
