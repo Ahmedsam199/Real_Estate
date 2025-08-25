@@ -23,6 +23,8 @@ model User {
   Property Property[]
 
   Payment Payment[]
+
+  PrintSettings PrintSettings[]
 }
 model Customer {
   id Int @id @default(autoincrement())
@@ -131,4 +133,6 @@ model PrintSettings {
   title        String
   html         String @db.Text
   printSetting Json
+  userId Int
+  User User @relation(fields: [userId],references: [id])
 }
