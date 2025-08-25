@@ -10,9 +10,10 @@ import { PropertyModule } from './property/property.module';
 import { ContractModule } from './contract/contract.module';
 import { PaymentModule } from './payment/payment.module';
 import { ReportModule } from './report/report.module';
+import { PrintSettingModule } from './print-setting/print-setting.module';
 
 @Module({
-  imports: [AuthModule, CustomerModule, PropertyModule, ContractModule, PaymentModule, ReportModule],
+  imports: [AuthModule, CustomerModule, PropertyModule, ContractModule, PaymentModule, ReportModule, PrintSettingModule],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService, PrismaService],
 })
