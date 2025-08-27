@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PaymentStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUpdatePaymentDto } from './DTO/CreatetUpdatepayment.dto';
+import { getStartAndEndOfThisMonth } from 'src/utils/dateUtils';
 
 @Injectable()
 export class PaymentService {
@@ -50,18 +51,33 @@ export class PaymentService {
       paymentMethod,
       remarks,
     } = createPaymentDto;
-
-    return this.prismaService.payment.create({
-      data: {
-        contractId,
-        amount,
-        paymentStatus,
-        paymentDate: paymentDate ? new Date(paymentDate) : new Date(),
-        paymentMethod,
-        remarks,
-        userId,
+    const startAndEndOfThisMonth = getStartAndEndOfThisMonth();
+    const paymentsIn = await this.prismaService.payment.findFirst({
+      where: {
+        paymentDate: {
+          gte: startAndEndOfThisMonth[0],
+          lte: startAndEndOfThisMonth[1],
+        },
       },
     });
+    if (!paymentsIn) {
+      return this.prismaService.payment.create({
+        data: {
+          contractId,
+          amount,
+          paymentStatus,
+          paymentDate: paymentDate ? new Date(paymentDate) : new Date(),
+          paymentMethod,
+          remarks,
+          userId,
+        },
+      });
+    } else {
+      throw new HttpException(
+        'Cant insert 2 payment in same date',
+        HttpStatus.CONFLICT,
+      );
+    }
   }
 
   async updatePayment(
