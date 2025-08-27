@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { PaymentStatus } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getStartOfTheMonth } from 'src/utils/dateUtils';
 import {
   getMonthsBetween,
   isDateInMonth,
@@ -78,7 +79,10 @@ export class ReportService {
             contractId: contract.id, // Filter by specific contract, not all contractIds
             paymentStatus: PaymentStatus.PAID,
             paymentDate: {
-              gte: dateFrom,
+              // We getting start of the month
+              //  in case user put the fromDate in end if month
+              // he wont get it as unpaid
+              gte: getStartOfTheMonth(dateFrom),
               lte: dateTo,
             },
           },
