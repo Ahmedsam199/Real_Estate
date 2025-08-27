@@ -1,3 +1,8 @@
+export interface RequestWithUser extends Request {
+  user: {
+    userId: number;
+  };
+}
 export function getMonthsBetween(
   startDate: Date,
   endDate: Date,

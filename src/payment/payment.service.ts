@@ -109,6 +109,22 @@ export class PaymentService {
         id,
         userId, // Ensure user can only access their own payments
       },
+      include: {
+        contract: {
+          include: {
+            customer: {
+              select: {
+                name: true,
+              },
+            },
+            property: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
